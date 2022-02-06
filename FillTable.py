@@ -65,7 +65,6 @@ class FillTable:
 
     @staticmethod
     def fillTableWithWord(chars, driver):
-        chars.strip()
         for char in chars:
             if char != '\n':
                 element = WebDriverWait(driver, 3).until(

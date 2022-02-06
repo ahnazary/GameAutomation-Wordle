@@ -19,10 +19,21 @@ print(FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords())
 fillTable.filterWords()
 guessRound += 1
 
+# while True:
+#     print(fillTable.getAllWords())
+#     FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
+#     FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
+#     print(FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()))
+#     if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
+#         guessRound = 0
+#     fillTable.filterWords()
+#     guessRound += 1
+
 print(fillTable.getAllWords())
 FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
 FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-print(FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()))
+if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
+    quit()
 fillTable.filterWords()
 guessRound += 1
 
@@ -30,13 +41,31 @@ guessRound += 1
 print(fillTable.getAllWords())
 FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
 FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-print(FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()))
+if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
+    quit()
 fillTable.filterWords()
 guessRound += 1
 
 print(fillTable.getAllWords())
 FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
 FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-print(FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()))
+if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
+    quit()
+fillTable.filterWords()
+guessRound += 1
+
+print(fillTable.getAllWords())
+FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
+FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
+if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
+    quit()
+fillTable.filterWords()
+guessRound += 1
+
+print(fillTable.getAllWords())
+FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
+FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
+if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
+    quit()
 fillTable.filterWords()
 guessRound += 1
