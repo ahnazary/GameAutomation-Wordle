@@ -47,7 +47,7 @@ class FillTable:
     def __init__(self):
         bannedChars = ['\'', '"']
 
-        wordsFilePath = os.path.abspath(os.path.dirname(__file__)) + '/words.txt'
+        wordsFilePath = os.path.abspath(os.path.dirname(__file__)) + '/words_wiki.txt'
         with open(wordsFilePath) as f:
             words = f.readlines()
         self.words = words
@@ -65,11 +65,13 @@ class FillTable:
 
     @staticmethod
     def fillTableWithWord(chars, driver):
+        chars.strip()
         for char in chars:
-            element = WebDriverWait(driver, 3).until(
-                EC.presence_of_element_located((By.XPATH, charsXpath.get(char)))
-            )
-            element.click()
+            if char != '\n':
+                element = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.XPATH, charsXpath.get(char)))
+                )
+                element.click()
         element = WebDriverWait(driver, 3).until(
             EC.presence_of_element_located((By.XPATH, charsXpath.get('enter')))
         )
@@ -90,6 +92,9 @@ class FillTable:
 
             elif element.get_attribute("class") == 'RowL-letter letter-elsewhere':
                 elsewhereChars[lastGuessedWord[i - 1]] = i
+        for char in absentChars:
+            if char in elsewhereChars or char in correctChars:
+                absentChars.remove(char)
 
     @staticmethod
     def gotAllCorrect(driver, guessRound, lastGuessedWord):
@@ -106,12 +111,11 @@ class FillTable:
         else:
             return False
 
-
     def filterWords(self):
         self.words = [ele for ele in self.words if all(ch not in ele for ch in absentChars)]
         print('absent chars are', absentChars)
         absentChars.clear()
-        self.words = [ele for ele in self.words if all(ch in ele for ch in elsewhereChars)]
+        # self.words = [ele for ele in self.words if all(ch in ele for ch in elsewhereChars)]
         for key in correctChars:
             filterStr = "^"
             for i in range(1, 6):
