@@ -1,7 +1,8 @@
 import os
+import time
 
 from selenium import webdriver
-from FillTable import charsXpath, FillTable, absentChars, correctChars, elsewhereChars
+from FillTable import FillTable
 
 
 driverPath = os.path.abspath(os.path.dirname(__file__)) + '/chromedriver_linux64/chromedriver'
@@ -12,7 +13,7 @@ initialGuess = 'crane'
 guessRound = 1
 
 fillTable = FillTable(driver)
-
+time.sleep(15)
 while True:
     if guessRound == 1:
         fillTable.resetWords()

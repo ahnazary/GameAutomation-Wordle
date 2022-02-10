@@ -56,6 +56,7 @@ class FillTable:
         for i in range(len(self.words)):
             self.words[i] = self.words[i].lower()
         filters.append(re.compile(r"^.{5}$"))
+
         filters.append(re.compile(r"\s*[a-z]\w*\s*"))
         for item in filters:
             self.words = list(filter(item.match, self.words))
@@ -203,7 +204,7 @@ class FillTable:
 
     def getNextGuessWords(self):
         for word in self.words:
-            if word != '':
+            if word != '' and "'" not in word:
                 return word
 
     def getAllWords(self):
