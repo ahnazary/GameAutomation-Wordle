@@ -35,6 +35,8 @@ charsXpath = {
     "n": '//*[@id="root"]/div/div[1]/div[11]/div[3]/div[7]',
     "m": '//*[@id="root"]/div/div[1]/div[11]/div[3]/div[8]',
     "enter": '//*[@id="root"]/div/div[1]/div[11]/div[3]/div[9]',
+    "backspace": '//*[@id="root"]/div/div[1]/div[11]/div[3]/div[1]'
+
 }
 
 absentChars = []
@@ -44,24 +46,21 @@ filters = []
 
 
 class FillTable:
-    def __init__(self):
-        bannedChars = ['\'', '"']
-
+    def __init__(self, driver):
+        self.driver = driver
         wordsFilePath = os.path.abspath(os.path.dirname(__file__)) + '/words_wiki.txt'
         with open(wordsFilePath) as f:
-            words = f.readlines()
-        self.words = words
-        self.words = [x for x in self.words if len(x) > 2]
-        # self.words = [re.sub(r"\s*[A-Z]\w*\s*", "", i).strip() for i in self.words]
+            self.words = f.readlines()
+
+        self.words = [x for x in self.words if len(x) > 4]
         for i in range(len(self.words)):
             self.words[i] = self.words[i].lower()
-        self.words = [ele for ele in self.words if all(ch not in ele for ch in bannedChars)]
-        filters.append(re.compile("^.{5}$"))
+        filters.append(re.compile(r"^.{5}$"))
         filters.append(re.compile(r"\s*[a-z]\w*\s*"))
         for item in filters:
             self.words = list(filter(item.match, self.words))
-
         filters.clear()
+        self.originalWords = self.words
 
     @staticmethod
     def fillTableWithWord(chars, driver):
@@ -84,23 +83,44 @@ class FillTable:
                 EC.presence_of_element_located((By.XPATH, xPath))
             )
             if element.get_attribute("class") == 'RowL-letter letter-absent':
-                absentChars.append(lastGuessedWord[i - 1])
+                if element.text.lower() != '' or element.text.lower() is not None:
+                    absentChars.append(element.text.lower())
+                else:
+                    xPath = '//*[@id="root"]/div/div[1]/div[{}]/div[{}]'.format(guessRound, i)
+                    element = WebDriverWait(driver, 3).until(
+                        EC.presence_of_element_located((By.XPATH, xPath))
+                    )
+                    absentChars.append(element.text.lower())
 
             elif element.get_attribute("class") == 'RowL-letter letter-correct':
-                correctChars[lastGuessedWord[i - 1]] = i
+                if element.text.lower() != '' or element.text.lower() is not None:
+                    correctChars[element.text.lower()] = i
+                else:
+                    xPath = '//*[@id="root"]/div/div[1]/div[{}]/div[{}]'.format(guessRound, i)
+                    element = WebDriverWait(driver, 3).until(
+                        EC.presence_of_element_located((By.XPATH, xPath))
+                    )
+                    correctChars[element.text.lower()] = i
 
             elif element.get_attribute("class") == 'RowL-letter letter-elsewhere':
-                elsewhereChars[lastGuessedWord[i - 1]] = i
+                if element.text.lower() != '' or element.text.lower() is not None:
+                    elsewhereChars[element.text.lower()] = i
+                else:
+                    xPath = '//*[@id="root"]/div/div[1]/div[{}]/div[{}]'.format(guessRound, i)
+                    element = WebDriverWait(driver, 3).until(
+                        EC.presence_of_element_located((By.XPATH, xPath))
+                    )
+                    elsewhereChars[element.text.lower()] = i
+
         for char in absentChars:
             if char in elsewhereChars or char in correctChars:
                 absentChars.remove(char)
 
-    @staticmethod
-    def gotAllCorrect(driver, guessRound, lastGuessedWord):
+    def gotAllCorrect(self, guessRound):
         result = 0
         for i in range(1, 6):
             xPath = '//*[@id="root"]/div/div[1]/div[{}]/div[{}]'.format(guessRound + 1, i)
-            element = WebDriverWait(driver, 3).until(
+            element = WebDriverWait(self.driver, 3).until(
                 EC.presence_of_element_located((By.XPATH, xPath))
             )
             if element.get_attribute("class") == 'RowL-letter letter-correct':
@@ -114,7 +134,8 @@ class FillTable:
         self.words = [ele for ele in self.words if all(ch not in ele for ch in absentChars)]
         print('absent chars are', absentChars)
         absentChars.clear()
-        # self.words = [ele for ele in self.words if all(ch in ele for ch in elsewhereChars)]
+        self.words = [ele for ele in self.words if all(ch in ele for ch in elsewhereChars)]
+
         for key in correctChars:
             filterStr = "^"
             for i in range(1, 6):
@@ -147,7 +168,38 @@ class FillTable:
 
         print('elsewhere chars are', elsewhereChars)
         elsewhereChars.clear()
-        self.words = [x for x in self.words if len(x) > 2]
+        filters.clear()
+        self.words = [x for x in self.words if len(x) > 4]
+
+    def invalidWordAlert(self, guessedWord):
+        xPath = '//*[@id="root"]/div/div[1]/div[9]'
+        element = WebDriverWait(self.driver, 3).until(
+            EC.presence_of_element_located((By.XPATH, xPath))
+        )
+        if element.text is not None:
+            for i in range(1, 6):
+                element = WebDriverWait(self.driver, 3).until(
+                    EC.presence_of_element_located((By.XPATH, charsXpath.get('backspace')))
+                )
+                element.click()
+            if guessedWord in self.words:
+                self.words.remove(guessedWord)
+            return True
+        return False
+
+    def resetWords(self):
+        self.words = self.originalWords
+
+    def exitWinningMenu(self):
+        xPath = '//*[@id="root"]/div/div[1]/div[9]/div/button'
+        element = WebDriverWait(self.driver, 3).until(
+            EC.presence_of_element_located((By.XPATH, xPath))
+        )
+        element.click()
+        element = WebDriverWait(self.driver, 3).until(
+            EC.presence_of_element_located((By.XPATH, charsXpath.get('enter')))
+        )
+        element.click()
 
     def getNextGuessWords(self):
         for word in self.words:

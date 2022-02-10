@@ -8,64 +8,28 @@ driverPath = os.path.abspath(os.path.dirname(__file__)) + '/chromedriver_linux64
 driver = webdriver.Chrome(driverPath)
 driver.get('https://www.wordleunlimited.com/')
 
-initialGuess = 'beast'
+initialGuess = 'crane'
 guessRound = 1
 
-fillTable = FillTable()
+fillTable = FillTable(driver)
 
-FillTable.fillTableWithWord(initialGuess, driver)
-FillTable.evaluateGuess(driver, guessRound, initialGuess)
-print(FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()))
-fillTable.filterWords()
-guessRound += 1
+while True:
+    if guessRound == 1:
+        fillTable.resetWords()
+        FillTable.fillTableWithWord(initialGuess, driver)
+        FillTable.evaluateGuess(driver, guessRound, initialGuess)
+        fillTable.invalidWordAlert(initialGuess)
+        fillTable.filterWords()
+        guessRound += 1
 
-# while True:
-#     print(fillTable.getAllWords())
-#     FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
-#     FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-#     print(FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()))
-#     if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
-#         guessRound = 0
-#     fillTable.filterWords()
-#     guessRound += 1
+    else:
+        print(fillTable.getAllWords())
+        FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
+        FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
+        fillTable.invalidWordAlert(fillTable.getNextGuessWords())
+        fillTable.filterWords()
+        if fillTable.gotAllCorrect(guessRound):
+            guessRound = 0
+            fillTable.exitWinningMenu()
+        guessRound += 1
 
-print(fillTable.getAllWords())
-FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
-FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
-    quit()
-fillTable.filterWords()
-guessRound += 1
-
-
-print(fillTable.getAllWords())
-FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
-FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
-    quit()
-fillTable.filterWords()
-guessRound += 1
-
-print(fillTable.getAllWords())
-FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
-FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
-    quit()
-fillTable.filterWords()
-guessRound += 1
-
-print(fillTable.getAllWords())
-FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
-FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
-    quit()
-fillTable.filterWords()
-guessRound += 1
-
-print(fillTable.getAllWords())
-FillTable.fillTableWithWord(fillTable.getNextGuessWords(), driver)
-FillTable.evaluateGuess(driver, guessRound, fillTable.getNextGuessWords())
-if FillTable.gotAllCorrect(driver, guessRound, fillTable.getNextGuessWords()):
-    quit()
-fillTable.filterWords()
-guessRound += 1
